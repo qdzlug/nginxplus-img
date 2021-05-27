@@ -22,7 +22,7 @@ A full discussion of the diskimage build system is out of scope for this documen
 
 The file/directory structure for the bulding process looks like this:
 
-````
+```
 nginx-plus
 ├── element-deps
 ├── environment.d
@@ -35,7 +35,6 @@ nginx-plus
 └── post-install.d
 ```
 
-The key files are as follows:
 | File/Directory | Purpose |
 |----------------|---------|
 | element-deps   | List of the key dependencies for the image buid; includes the base image to be used and what tasks to complete (such as enabling a serial console)    |
