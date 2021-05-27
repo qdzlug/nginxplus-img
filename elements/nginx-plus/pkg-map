@@ -1,0 +1,45 @@
+{
+    "release": {
+      "centos": {
+        "8": {
+          "ntp": "chrony"
+        }
+      }
+    },
+    "family": {
+        "redhat": {
+            "curl": "curl",
+            "dnsutils": "bind-utils",
+            "git": "git",
+            "htop": "htop",
+            "iptables": "iptables",
+            "man": "man-db",
+            "nano": "nano",
+            "netcat": "nc",
+            "ntp": "ntp",
+            "ping": "iputils",
+            "resolvconf": "",
+            "syslog": "rsyslog",
+            "tree": "tree",
+            "vim": "vim-enhanced",
+            "wget": "wget"
+        },
+        "debian":{
+            "curl": "curl",
+            "dnsutils": "dnsutils",
+            "git": "git",
+            "htop": "htop",
+            "iptables": "iptables",
+            "man": "man",
+            "nano": "nano",
+            "netcat": "netcat-openbsd",
+            "ntp": "ntp",
+            "ping": "inetutils-ping",
+            "resolvconf": "resolvconf",
+            "syslog": "rsyslog",
+            "tree": "tree",
+            "vim": "vim",
+            "wget": "wget"
+        }
+    }
+}

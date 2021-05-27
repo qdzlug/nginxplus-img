@@ -1,0 +1,9 @@
+curl:
+dnsutils:
+man:
+netcat:
+ntp:
+ping:
+resolvconf:
+vim:
+cloud-init:
