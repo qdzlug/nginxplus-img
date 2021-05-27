@@ -80,11 +80,12 @@ The build process involves two steps:
     2. The output file, including the file extention indicating the format.
     2. The partition format being used; in this case we are using a block device with an MBR.
     3. The name of the project being built, in this case nginx-plus.
- `disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus`
+4. Command line: `disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus`
 
  ## Example 
 
  ```
+$ disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus
 2021-05-26 22:20:08.313 | diskimage-builder version 3.11.0
 2021-05-26 22:20:08.314 | Building elements: base block-device-mbr nginx-plus
 2021-05-26 22:20:08.372 | Expanded element dependencies to: growroot runtime-ssh-host-keys install-static cloud-init-datasources openssh-server sysprep modprobe block-device-mbr base pkg-map install-bin vm debootstrap nginx-plus manifests package-installs dhcp-all-interfaces enable-serial-console dpkg install-types dib-init-system debian-minimal bootloader
