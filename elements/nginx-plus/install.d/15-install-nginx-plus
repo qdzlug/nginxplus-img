@@ -5,9 +5,13 @@ echo "$(date)": Create Work Directory
 WORKDIR=/tmp/nginx-plus.$$
 mkdir $WORKDIR
 
+# Setup SSH to allow passwords
+echo "$(date)": Edit sshd_config to allow passwords
+sed -i.bak -e 's/^[#]*PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
 # Create the SSL Directory
-mkdir -p /etc/ssl/nginx
 echo "$(date)": Create SSL Directory
+mkdir -p /etc/ssl/nginx
 
 # Copy over the cert and key
 echo "$(date)": Pull down the certs from localhost
