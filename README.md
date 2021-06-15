@@ -113,3 +113,17 @@ $ disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus
 - If there are any issues with the build you will need to remediate them; the most common issues are around packages that need to be installed on the build machine.
 - This process may rquire sudo permissions depneding on your bulid environment. 
 
+## Post Build Editing
+It is possible to make changes to the image after it is built without re-running the build process. This requires that you use a utility such as [virt-customize](https://libguestfs.org/virt-customize.1.html). For example, the following code can be used to add a user, set the password for the user, add the user to the sudoers file, and inject an ssh key for the user:
+
+```
+ virt-customize -a theimage.qcow2 --run-command "adduser theuser"
+ virt-customize -a theimage.qcow2 --run-command "echo 'theuser  ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/theuser-sudo"
+ virt-customize -a theimage.qcow2 --password theuser:password:thepass
+ virt-customize -a theimage.qcow2 --ssh-inject theuser:string:"thesshkey"
+ ````
+
+ You will need to subsitute you own values for _theimage_, _theuser_, _thepass_, and _thesshkey_.
+
+ 
+
