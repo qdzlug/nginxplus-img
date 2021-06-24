@@ -1,0 +1,125 @@
+#!/bin/bash
+
+# Put in the default GW script
+echo "$(date)": Installing the default GW script
+cat > /usr/local/bin/add-default.sh << EOF
+#!/usr/bin/env bash
+#
+# Simple shell script to add a default route/interface
+# in debian depending on the parameters passed.
+# This shell script # does no verification and very
+# little error checking and # should not be used in production.
+#
+# Arguments are expected in this order....
+ADDRESS=$1
+NETMASK=$2
+GATEWAY=$3
+
+# Are we root?
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
+# Correct number of arguments?
+if (( $# != 3 )); then
+    >&2 echo "Usage: $0 ADDRESS NETMASK GATEWAY"
+    exit 2
+fi
+
+# We need to find the first interface, which will
+# have the lowest number
+IFACENUM=$(ls /sys/class/net | grep -v lo | sed 's/ens//g' | sort -n | head -1)
+INTERFACE=ens$IFACENUM
+echo "We will be adding $INTERFACE"
+
+# Make sure our interface exists
+if [ -x /sys/class/net/$INTERFACE ] ; then
+  echo "Interface $INTERFACE found"
+else
+  echo "Interface $INTERFACE not found"
+  exit 3
+fi
+
+# Build out our interface stanza. Since this
+# is the default we will rewrite the interface
+# file to ensure we don't get any cruft in it.
+THEFILE=/etc/network/interfaces
+
+echo "auto lo" > $THEFILE
+echo "iface lo inet loopback" >> $THEFILE
+echo "" >> $THEFILE
+echo "source /etc/network/interfaces.d/*" >> $THEFILE
+echo "" >> $THEFILE
+echo "iface $INTERFACE inet static" >> $THEFILE
+echo "address $ADDRESS" >> $THEFILE
+echo "netmask $NETMASK" >> $THEFILE
+echo "gateway $GATEWAY" >> $THEFILE
+echo "dns-nameserver 8.8.8.8" >> $THEFILE
+echo "dns-nameserver 8.8.4.4" >> $THEFILE
+
+# List the file
+echo "File built; contents are:"
+cat $THEFILE
+
+# Restart the interface
+/usr/sbin/ifdown $INTERFACE
+/usr/sbin/ifup $INTERFACE
+EOF
+
+# Put in the add interface script
+echo "$(date)": Installing the interface script
+cat > /usr/local/bin/add-net.sh << EOF
+#!/usr/bin/env bash
+#
+# Simple shell script to add network addresses. This script
+# does no verification and very little error checking and
+# should not be used in production.
+#
+# Arguments are expected in this order....
+INTERFACE=$1
+ADDRESS=$2
+NETMASK=$3
+GATEWAY=$4
+
+# Are we root?
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
+# Correct number of arguments?
+if (( $# != 4 )); then
+    >&2 echo "Usage: $0 INTERFACE ADDRESS NETMASK GATEWAY"
+    exit 2
+fi
+
+# Make sure our interface exists
+if [ -x /sys/class/net/$INTERFACE ] ; then
+  echo "Interface $INTERFACE found"
+else
+  echo "Interface $INTERFACE not found"
+  exit 3
+fi
+
+# Build out our interface stanza....
+THEFILE=/etc/network/interfaces.d/$INTERFACE
+
+echo "iface $INTERFACE inet static" > $THEFILE
+echo "address $ADDRESS" >> $THEFILE
+echo "netmask $NETMASK" >> $THEFILE
+echo "gateway $GATEWAY" >> $THEFILE
+
+# List the file
+echo "File built; contents are:"
+cat $THEFILE
+
+# Restart the interface
+/usr/sbin/ifdown $INTERFACE
+/usr/sbin/ifup $INTERFACE
+EOF
+
+# Change the perms for execution....
+echo "$(date)": Fixing permissions
+chmod 755 /usr/local/bin/add-gateway.sh
+chmod 755 /usr/local/bin/add-net.sh
