@@ -1,0 +1,15 @@
+#cloud-config
+hostname: nginxplus
+manage_etc_hosts: true
+users:
+  - default
+  - name: nplus
+    gecos: NGINX Plus Test User
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users, admin
+    ssh_import_id: None
+    lock_passwd: false
+    # Default password is NginxPlus2021; generate via "mkpasswd --method=SHA-512 --rounds=4096"
+    passwd: $6$rounds=4096$rfGPckdj$uP8a3fh8x6bXtl99kO.6eAq3qKGPHqQgQsxZYGYoF5z29mAuFrV.ycb1txmcn3CcQKWnFU5.iO6owThmTKSQ60
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDh6ROxdnUrSAmjyqzlpvcSFlXcSwD7VMp7PvCTzAtDePSluBiQq3njWW88Pcxgmhsqhsm/ZjRKTdFO5RWRt2YM3BsZQqIMlsulIKK426RavgtnMYpJuUhTkyVm1QQAaoOH4NvkBOk35VOWylzxSZFa2v+LExjOQzQM5CfXB2GX7KerNNvEMNuTnFQ5upuV8YOEeeeomfLmt/I8VMxFJiSQWlELkS2NBVbhWKHcRaE2T2X2eASaruqlDhSMgeE0K/8bRuLquvv5j0F3rQ6slbVi0zjdIMRUlwD4gsZOQaSiFrQceItR+slp3/2FT/o6uxW/lJu3sW5RkHNHMxubSFpl jschmidt@jack.virington.com
