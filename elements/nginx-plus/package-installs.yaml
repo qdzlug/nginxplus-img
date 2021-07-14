@@ -7,3 +7,4 @@ ping:
 resolvconf:
 vim:
 cloud-init:
+ipcalc:

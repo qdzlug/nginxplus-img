@@ -2,7 +2,7 @@
 
 # Put in the default GW script
 echo "$(date)": Installing the default GW script
-cat > /usr/local/bin/add-default.sh << EOF
+cat > /usr/local/bin/add-default.sh << 'EOF'
 #!/usr/bin/env bash
 #
 # Simple shell script to add a default route/interface
@@ -69,7 +69,7 @@ EOF
 
 # Put in the add interface script
 echo "$(date)": Installing the interface script
-cat > /usr/local/bin/add-net.sh << EOF
+cat > /usr/local/bin/add-net.sh << 'EOF'
 #!/usr/bin/env bash
 #
 # Simple shell script to add network addresses. This script
@@ -108,15 +108,30 @@ THEFILE=/etc/network/interfaces.d/$INTERFACE
 echo "iface $INTERFACE inet static" > $THEFILE
 echo "address $ADDRESS" >> $THEFILE
 echo "netmask $NETMASK" >> $THEFILE
-echo "gateway $GATEWAY" >> $THEFILE
 
 # List the file
 echo "File built; contents are:"
 cat $THEFILE
 
 # Restart the interface
+echo "Bringing the interface down and back up; ignore any errors on downing..."
 /usr/sbin/ifdown $INTERFACE
 /usr/sbin/ifup $INTERFACE
+
+/usr/sbin/ip addr show dev $INTERFACE
+
+# Calculate the CIDR
+THECIDR=$(/usr/bin/ipcalc -b $ADDRESS $NETMASK | egrep "Network" | awk '{print $2}')
+
+# Add the static route
+echo "Adding static route for $THECIDR on address $ADDRESS via interface $INTERFACE"
+/usr/sbin/ip route add $THECIDR via $ADDRESS dev $INTERFACE
+if [ $? -ne 0 ] ; then
+  echo "Found route, attempting to change..."
+  /usr/sbin/ip route change $THECIDR via $ADDRESS dev $INTERFACE
+fi
+
+/usr/sbin/route -n
 EOF
 
 # Change the perms for execution....
