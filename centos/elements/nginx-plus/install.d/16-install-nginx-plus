@@ -1,0 +1,85 @@
+#!/bin/bash
+
+# Create a work directory
+echo "$(date)": Create Work Directory
+WORKDIR=/tmp/nginx-plus.$$
+mkdir $WORKDIR
+
+# Setup SSH to allow passwords
+echo "$(date)": Edit sshd_config to allow passwords
+sed -i.bak -e 's/^[#]*PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Create the SSL Directory
+echo "$(date)": Create SSL Directory
+mkdir -p /etc/ssl/nginx
+
+# Copy over the cert and key
+echo "$(date)": Pull down the certs from localhost
+wget http://localhost:8080/certs.tar 
+
+# Copy over the cert and key
+echo "$(date)": Untar Cert and Key to SSL Directory
+tar xvf certs.tar -C /etc/ssl/nginx
+
+# Copy over the cert and key
+echo "$(date)": Remove cert tar
+rm certs.tar
+
+# Download and install the signing key
+#echo "$(date)": Install Signing Key
+#cd $WORKDIR || exit
+#wget https://cs.nginx.com/static/keys/nginx_signing.key && sudo apt-key add nginx_signing.key
+
+# Install the reqs
+echo "$(date)": Install Prequisities
+yum -y install ca-certificates
+
+# Add the repo
+echo "$(date)": Adding the NGINX Plus repo
+wget -P /etc/yum.repos.d https://cs.nginx.com/static/files/nginx-plus-7.4.repo
+
+# Install the plus package
+echo "$(date)": Installing the NGINX Plus package
+yum -y install nginx-plus
+
+# Put in our config
+echo "$(date)": Installing the NGINX Plus sample config
+cat > /etc/nginx/conf.d/default.conf << EOF
+server {
+    listen       80 default_server;
+    server_name  localhost;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # API
+    location /api/ {
+        api write=on;
+    }
+
+    # Dashboard
+    location = /dashboard.html {
+        root /usr/share/nginx/html;
+    }
+}
+EOF
+
+# Validate the version
+echo "$(date)": Validating the Version
+/usr/sbin/nginx -v
+
+# Clean up the certs
+echo "$(date)": Cleaning the Certs
+rm /etc/ssl/nginx/nginx-repo.crt || exit
+rm /etc/ssl/nginx/nginx-repo.key || exit
+
+# Cleaning the work directory
+echo "$(date)": Cleaning the Work diretory
+rm -rf $WORKDIR

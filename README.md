@@ -2,12 +2,12 @@
 This repository will walk you through the process of building a qcow2 image file that will enable you to deploy NGINX Plus in a VM. 
 
 ## Important Caveats
-- You need to have a supported linux build environment. These builds were done on Ubuntu 20.10; your mileage may vary on other platforms.
+- You need to have a supported linux build environment. These builds were done on Ubuntu 21.04; your mileage may vary on other platforms.
 - This process uses [diskimage-builder](https://docs.openstack.org/diskimage-builder/latest/index.html) to create the image.
 * This process requires that you have a valid cert/key pair for NGINX Plus.
 * The cert and key are used in the buld, but are not contained in the repository. They are pulled from a local http server (instructions below) and removed from the image prior to it being finalized. 
 - This process will build a bare-bones deployment that exposes the API and nginx-dashboard as part of the deployment; this is only for development and teting purposes, with the configuration being passed in a heredoc. For actual usage, the data should be passed using the disk-image-builder `extra-data.d` element.
-- The image built is based off Debian 10, with a selection of packages suitable for debugging. These can be adjusted as needed.
+- The image built is can be based off Debian 10 or CentOS 7, with a selection of packages suitable for debugging. These can be adjusted as needed.
 
 ## Setup
 It is recommended that you install the diskimage builder in a virtualenv:
@@ -24,15 +24,30 @@ The file/directory structure for the bulding process looks like this:
 
 ```
 nginx-plus
-├── element-deps
-├── environment.d
-│   └── 10-cloud-init-datasources
-├── extra-data.d
-├── install.d
-│   └── 15-install-nginx-plus
-├── package-installs.yaml
-├── pkg-map
-└── post-install.d
+├── centos
+│   └── elements
+│       ├── dib-elements
+│       │   ├── bin
+│       │   ├── lib
+│       │   └── share
+│       └── nginx-plus
+│           ├── environment.d
+│           ├── extra-data.d
+│           ├── install.d
+│           ├── nginxplus.d
+│           └── post-install.d
+└── debian
+    └── elements
+        ├── dib-elements
+        │   ├── bin
+        │   ├── lib
+        │   └── share
+        └── nginx-plus
+            ├── environment.d
+            ├── extra-data.d
+            ├── install.d
+            ├── nginxplus.d
+            └── post-install.d
 ```
 
 | File/Directory | Purpose |
@@ -43,6 +58,7 @@ nginx-plus
 | extra-data.d                | Currently empty; can be used to pass files into the build environment.         |
 | install.d                | Files used during the install phase of the build. |
 | 15-install-nginx-plus | Customized script to install nginx-plus; uses an external webserver for certs and has an inline configuration. |
+| 18-copy-util-scripts | Customized networking scripts for the debian image; these are not very robust. |
 | package-installs.yaml | List of packages to be installed |
 | pkg-map | Mapping between package names between releases and families |
 | post-install.d | Currently empty; scripts / steps to be run following installation |
@@ -74,7 +90,8 @@ Hit CTRL-C to stop the server
 
 ## Build Processs
 The build process involves two steps:
-1. Export the path to `elements` directory you created when you cloned the repo; this can be absolute or relative. For example, `export ELEMENTS_PATH=./elements` or `export ELEMENTS_PATH=$HOME/repos/nginxplus-img/elements`
+1. Export the path to `elements` directory you created for the build type you wish (Debian or CentOS); this can be absolute or relative. For example, `export ELEMENTS_PATH=./elements` or `export ELEMENTS_PATH=$HOME/repos/nginxplus-img/debian/elements`
+2. Set your version variable. Currently has been tested with `DIB_RELEASE=7` for CentOS and `DIB_RELEASE=bullseye` for Debian
 2. Run the disk image creation process. This requires that you provide:
     1. The architecture (in this case amd64)
     2. The output file, including the file extention indicating the format.

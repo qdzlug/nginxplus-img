@@ -1,0 +1,2 @@
+declare -x DIB_ARGS="-a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus"
+declare -x DIB_PYTHON_EXEC="/usr/bin/python3"

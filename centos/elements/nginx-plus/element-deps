@@ -1,4 +1,4 @@
-debian-minimal
+centos
 base
 cloud-init-datasources
 dhcp-all-interfaces

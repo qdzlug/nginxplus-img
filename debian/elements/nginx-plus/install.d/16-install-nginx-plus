@@ -32,6 +32,7 @@ wget https://cs.nginx.com/static/keys/nginx_signing.key && sudo apt-key add ngin
 
 # Install the reqs
 echo "$(date)": Install Prequisities
+apt update
 apt-get install -y apt-transport-https lsb-release ca-certificates
 
 # Add the repo
