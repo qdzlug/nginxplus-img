@@ -49,7 +49,7 @@ apt-get update
 
 # Install the plus package
 echo "$(date)": Installing the NGINX Plus package
-apt-get install -y nginx-plus
+apt-get install -y nginx-plus nginx-ha-keepalived nginx-sync
 
 # Put in our config
 echo "$(date)": Installing the NGINX Plus sample config

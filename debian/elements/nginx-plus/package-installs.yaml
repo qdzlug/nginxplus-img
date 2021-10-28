@@ -8,3 +8,4 @@ resolvconf:
 vim:
 cloud-init:
 ipcalc:
+sshpass:
