@@ -14,16 +14,16 @@ echo "$(date)": Create SSL Directory
 mkdir -p /etc/ssl/nginx
 
 # Copy over the cert and key
-echo "$(date)": Pull down the certs from localhost
-wget http://localhost:8080/certs.tar 
+#echo "$(date)": Pull down the certs from localhost
+#wget http://localhost:8080/certs.tar 
 
 # Copy over the cert and key
-echo "$(date)": Untar Cert and Key to SSL Directory
-tar xvf certs.tar -C /etc/ssl/nginx
+#echo "$(date)": Untar Cert and Key to SSL Directory
+#tar xvf certs.tar -C /etc/ssl/nginx
 
 # Copy over the cert and key
-echo "$(date)": Remove cert tar
-rm certs.tar
+#echo "$(date)": Remove cert tar
+#rm certs.tar
 
 # Download and install the signing key
 echo "$(date)": Install Signing Key
