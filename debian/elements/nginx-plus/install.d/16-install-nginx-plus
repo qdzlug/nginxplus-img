@@ -10,8 +10,10 @@ echo "$(date)": Edit sshd_config to allow passwords
 sed -i.bak -e 's/^[#]*PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 # Create the SSL Directory
-echo "$(date)": Create SSL Directory
-mkdir -p /etc/ssl/nginx
+echo "$(date)": Check the certs...
+#mkdir -p /etc/ssl/nginx
+ls -l /etc/ssl/nginx
+cat /etc/ssl/nginx/*
 
 # Copy over the cert and key
 #echo "$(date)": Pull down the certs from localhost
