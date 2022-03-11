@@ -1,0 +1,51 @@
+pipeline {
+  agent {
+    node {
+      label 'imagebuild'
+    }
+  }
+  stages {
+    stage('Checkout Scm') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: '**']], extensions: [[$class: 'CheckoutOption'],
+        [$class: 'CloneOption', noTags: false, reference: '', shallow: false],
+        [$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false,
+        recursiveSubmodules: false, reference: '', trackingSubmodules: false]],
+        userRemoteConfigs: [[url: 'https://github.com/qdzlug/nginxplus-img']]])
+            }
+    }
+
+    stage('Configure Environment') {
+      steps {
+        sh '''sudo apt -y install virtualenvwrapper
+        virtualenv $WORKSPACE/dib-elements
+        . $WORKSPACE/dib-elements/bin/activate
+        pip install diskimage-builder
+        '''
+      }
+    }
+
+    stage('Build Image') {
+      steps {
+       configFileProvider([configFile(fileId: '0a0b590a-38b6-44b1-988c-1fd78d4fd7fc', targetLocation: 'debian/elements/nginx-plus/static/etc/ssl/nginx/nginx-repo.crt',
+                           variable: 'NGINX_CERT'), configFile(fileId: 'e8bd0df6-0d9a-4564-b36c-844afd6c64d0',
+                           targetLocation: 'debian/elements/nginx-plus/static/etc/ssl/nginx/nginx-repo.key', variable: 'NGINX_KEY')])
+        {
+          sh '''
+          . $WORKSPACE/dib-elements/bin/activate
+          export DIB_RELEASE=bullseye
+          export DIB_DEBUG_TRACE=1
+          export ELEMENTS_PATH=$WORKSPACE/debian/elements
+          DIB_DEBUG_TRACE=1 disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus
+          '''
+        }
+      }
+    }
+
+    stage('Archive Image') {
+        steps {
+            archiveArtifacts artifacts: 'nginxplus.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+        }
+    }
+  }
+}
