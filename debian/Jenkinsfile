@@ -7,7 +7,7 @@ pipeline {
   stages {
     stage('Checkout Scm') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '**']], extensions: [[$class: 'CheckoutOption'],
+        checkout([$class: 'GitSCM', branches: [[name: 'main']], extensions: [[$class: 'CheckoutOption'],
         [$class: 'CloneOption', noTags: false, reference: '', shallow: false],
         [$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false,
         recursiveSubmodules: false, reference: '', trackingSubmodules: false]],
@@ -18,7 +18,7 @@ pipeline {
     stage('Configure Environment') {
       steps {
         sh '''sudo apt -y install virtualenvwrapper
-        virtualenv $WORKSPACE/dib-elements
+        virtualenv $WORKSPACE/dib-elements:1checkout
         . $WORKSPACE/dib-elements/bin/activate
         pip install diskimage-builder
         '''
