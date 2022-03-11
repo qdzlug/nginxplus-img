@@ -15,6 +15,11 @@ echo "$(date)": Check the certs...
 ls -l /etc/ssl/nginx
 cat /etc/ssl/nginx/*
 
+# Fix the file permissions
+echo "$(date)": Adjust Cert Permissions
+chmod 644 /etc/ssl/nginx/nginx-repo.crt
+chmod 644 /etc/ssl/nginx/nginx-repo.key
+
 # Copy over the cert and key
 #echo "$(date)": Pull down the certs from localhost
 #wget http://localhost:8080/certs.tar 
