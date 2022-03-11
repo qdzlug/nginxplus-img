@@ -9,3 +9,6 @@ vim:
 cloud-init:
 ipcalc:
 sshpass:
+syslog:
+tcpdump:
+ethtool:
