@@ -7,12 +7,9 @@ pipeline {
   stages {
     stage('Checkout Scm') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: 'main']], extensions: [[$class: 'CheckoutOption'],
-        [$class: 'CloneOption', noTags: false, reference: '', shallow: false],
-        [$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false,
-        recursiveSubmodules: false, reference: '', trackingSubmodules: false]],
-        userRemoteConfigs: [[url: 'https://github.com/qdzlug/nginxplus-img']]])
-            }
+      checkout([$class: 'GitSCM', branches: [[name: '**']], extensions: [[$class: 'PerBuildTag']],
+                userRemoteConfigs: [[url: 'https://github.com/qdzlug/nginxplus-img']]])
+      }
     }
 
     stage('Configure Environment') {
