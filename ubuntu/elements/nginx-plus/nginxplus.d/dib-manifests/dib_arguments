@@ -1,0 +1,1 @@
+-a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus

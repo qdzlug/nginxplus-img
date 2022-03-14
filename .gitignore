@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+ubuntu/elements/nginx-plus/static/etc/ssl/nginx/

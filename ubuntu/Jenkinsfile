@@ -24,16 +24,16 @@ pipeline {
 
     stage('Build Image') {
       steps {
-       configFileProvider([configFile(fileId: '0a0b590a-38b6-44b1-988c-1fd78d4fd7fc', targetLocation: 'debian/elements/nginx-plus/static/etc/ssl/nginx/nginx-repo.crt',
+       configFileProvider([configFile(fileId: '0a0b590a-38b6-44b1-988c-1fd78d4fd7fc', targetLocation: 'ubuntu/elements/nginx-plus/static/etc/ssl/nginx/nginx-repo.crt',
                            variable: 'NGINX_CERT'), configFile(fileId: 'e8bd0df6-0d9a-4564-b36c-844afd6c64d0',
-                           targetLocation: 'debian/elements/nginx-plus/static/etc/ssl/nginx/nginx-repo.key', variable: 'NGINX_KEY')])
+                           targetLocation: 'ubuntu/elements/nginx-plus/static/etc/ssl/nginx/nginx-repo.key', variable: 'NGINX_KEY')])
         {
           sh '''
           . $WORKSPACE/dib-elements/bin/activate
-          export DIB_RELEASE=bullseye
+          export DIB_RELEASE=focal
           export DIB_DEBUG_TRACE=1
-          export ELEMENTS_PATH=$WORKSPACE/debian/elements
-          disk-image-create -a amd64 -o nginxplus-debian.qcow2 block-device-mbr nginx-plus
+          export ELEMENTS_PATH=$WORKSPACE/ubuntu/elements
+          disk-image-create -a amd64 -o nginxplus-ubuntu.qcow2 block-device-mbr nginx-plus
           '''
         }
       }
@@ -41,7 +41,7 @@ pipeline {
 
     stage('Archive Image') {
         steps {
-            archiveArtifacts artifacts: 'nginxplus-debian.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+            archiveArtifacts artifacts: 'nginxplus-ubuntu.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
         }
     }
   }

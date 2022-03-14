@@ -1,0 +1,10 @@
+ubuntu
+base
+cloud-init-datasources
+dhcp-all-interfaces
+enable-serial-console
+growroot
+openssh-server
+package-installs
+pkg-map
+vm
