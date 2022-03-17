@@ -14,7 +14,7 @@ pipeline {
 
     stage('Configure Environment') {
       steps {
-        sh '''sudo apt -y install virtualenvwrapper
+        sh '''sudo apt -y install virtualenvwrapper qemu-utils
         virtualenv $WORKSPACE/dib-elements
         . $WORKSPACE/dib-elements/bin/activate
         pip install diskimage-builder
