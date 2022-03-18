@@ -32,11 +32,25 @@ pipeline {
           . $WORKSPACE/dib-elements/bin/activate
           export DIB_RELEASE=focal
           export DIB_DEBUG_TRACE=1
+          export DIB_DEV_USER_USERNAME=devuser
+          export DIB_DEV_USER_SHELL=/bin/bash
+          export DIB_DEV_USER_PWDLESS_SUDO=yes
+          export DIB_DEV_USER_PASSWORD=password
           export ELEMENTS_PATH=$WORKSPACE/ubuntu/elements
           disk-image-create -a amd64 -o nginxplus-ubuntu-$BUILD_ID.qcow2 block-device-mbr nginx-plus
           '''
         }
       }
+    }
+
+    stage ('Inject Users') {
+        steps {
+            sh '''
+            virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --run-command "adduser nplus"
+            virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --run-command "echo 'nplus  ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/nplus-sudo"
+            virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --password user1:password:NginxPlus2022
+            '''
+        }
     }
 
     stage('Archive Image') {
