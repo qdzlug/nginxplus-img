@@ -1,4 +1,4 @@
-ubuntu
+ubuntu-minimal
 base
 cloud-init-datasources
 dhcp-all-interfaces
@@ -8,3 +8,4 @@ openssh-server
 package-installs
 pkg-map
 vm
+journal-to-console
