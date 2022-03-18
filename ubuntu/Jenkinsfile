@@ -33,7 +33,7 @@ pipeline {
           export DIB_RELEASE=focal
           export DIB_DEBUG_TRACE=1
           export ELEMENTS_PATH=$WORKSPACE/ubuntu/elements
-          disk-image-create -a amd64 -o nginxplus-ubuntu.qcow2 block-device-mbr nginx-plus
+          disk-image-create -a amd64 -o nginxplus-ubuntu-$BUILD_ID.qcow2 block-device-mbr nginx-plus
           '''
         }
       }
@@ -41,7 +41,7 @@ pipeline {
 
     stage('Archive Image') {
         steps {
-            archiveArtifacts artifacts: 'nginxplus-ubuntu.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+            archiveArtifacts artifacts: 'nginxplus-ubuntu-$BUILD_ID.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
         }
     }
   }
