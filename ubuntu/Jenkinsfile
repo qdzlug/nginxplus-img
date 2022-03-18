@@ -41,7 +41,7 @@ pipeline {
 
     stage('Archive Image') {
         steps {
-            archiveArtifacts artifacts: 'nginxplus-ubuntu-$BUILD_ID.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+            archiveArtifacts artifacts: '*.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
         }
     }
   }
