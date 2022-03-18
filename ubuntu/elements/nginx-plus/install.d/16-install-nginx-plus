@@ -20,18 +20,6 @@ echo "$(date)": Adjust Cert Permissions
 chmod 644 /etc/ssl/nginx/nginx-repo.crt
 chmod 644 /etc/ssl/nginx/nginx-repo.key
 
-# Copy over the cert and key
-#echo "$(date)": Pull down the certs from localhost
-#wget http://localhost:8080/certs.tar 
-
-# Copy over the cert and key
-#echo "$(date)": Untar Cert and Key to SSL Directory
-#tar xvf certs.tar -C /etc/ssl/nginx
-
-# Copy over the cert and key
-#echo "$(date)": Remove cert tar
-#rm certs.tar
-
 # Download and install the signing key
 echo "$(date)": Install Signing Key
 cd $WORKDIR || exit
@@ -58,7 +46,8 @@ apt-get update
 echo "$(date)": Installing the NGINX Plus package
 apt-get install -y nginx-plus nginx-ha-keepalived nginx-sync
 
-# Put in our config
+# Put in our config - doing it here to make sure it does not
+# get confused with the package installed file
 echo "$(date)": Installing the NGINX Plus sample config
 cat > /etc/nginx/conf.d/default.conf << EOF
 server {
