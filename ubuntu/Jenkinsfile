@@ -43,15 +43,15 @@ pipeline {
       }
     }
 
-    stage ('Inject Users') {
-        steps {
-            sh '''
-            virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --run-command "adduser nplus"
-            virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --run-command "echo 'nplus  ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/nplus-sudo"
-            virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --password user1:password:NginxPlus2022
-            '''
-        }
-    }
+#    stage ('Inject Users') {
+        #steps {
+            #sh '''
+            #virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --run-command "adduser nplus"
+            #virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --run-command "echo 'nplus  ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/nplus-sudo"
+            #virt-customize -a nginxplus-ubuntu-$BUILD_ID.qcow2 --password user1:password:NginxPlus2022
+            #'''
+        #}
+    #}
 
     stage('Archive Image') {
         steps {
