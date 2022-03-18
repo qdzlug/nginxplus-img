@@ -44,5 +44,11 @@ pipeline {
             archiveArtifacts artifacts: '*.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
         }
     }
+
+    stage('Clean Workspace') {
+        steps {
+            cleanWs()
+        }
+    }
   }
 }
