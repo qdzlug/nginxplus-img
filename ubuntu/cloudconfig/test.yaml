@@ -1,0 +1,24 @@
+#cloud-config
+users:
+  - name: nplus
+    groups: sudo
+    shell: /bin/bash
+    lock_passwd: false
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh-authorized-keys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDh6ROxdnUrSAmjyqzlpvcSFlXcSwD7VMp7PvCTzAtDePSluBiQq3njWW88Pcxgmhsqhsm/ZjRKTdFO5RWRt2YM3BsZQqIMlsulIKK426RavgtnMYpJuUhTkyVm1QQAaoOH4NvkBOk35VOWylzxSZFa2v+LExjOQzQM5CfXB2GX7KerNNvEMNuTnFQ5upuV8YOEeeeomfLmt/I8VMxFJiSQWlELkS2NBVbhWKHcRaE2T2X2eASaruqlDhSMgeE0K/8bRuLquvv5j0F3rQ6slbVi0zjdIMRUlwD4gsZOQaSiFrQceItR+slp3/2FT/o6uxW/lJu3sW5RkHNHMxubSFpl jschmidt@jack.virington.com
+
+chpasswd:
+  list: |
+    root:password
+    nplus:password
+  expire: False
+  manage-resolv-conf: true
+  resolv_conf:
+    nameservers:
+      - '192.168.213.1'
+      - '8.8.8.8'
+      - '8.8.4.4'
+    searchdomains:
+      - virington.com
+      - zathras.io
+    domain: virington.com
