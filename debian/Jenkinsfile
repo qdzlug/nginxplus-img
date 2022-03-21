@@ -33,7 +33,7 @@ pipeline {
           export DIB_RELEASE=bullseye
           export DIB_DEBUG_TRACE=1
           export ELEMENTS_PATH=$WORKSPACE/debian/elements
-          disk-image-create -a amd64 -o nginxplus-debian.qcow2 block-device-mbr nginx-plus
+          disk-image-create -a amd64 -o nginxplus-debian-$BUILD_ID.qcow2 block-device-mbr nginx-plus
           '''
         }
       }
@@ -41,8 +41,14 @@ pipeline {
 
     stage('Archive Image') {
         steps {
-            archiveArtifacts artifacts: 'nginxplus-debian.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
+          archiveArtifacts artifacts: '*.qcow2', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
         }
     }
+
+    stage('Clean Workspace') {
+       steps {
+         cleanWs()
+    }
+   }
   }
 }
