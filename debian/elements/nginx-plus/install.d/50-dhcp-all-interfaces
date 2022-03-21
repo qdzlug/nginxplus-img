@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# Log date/time and exit
-echo "$(date)": In DHCP code
-true

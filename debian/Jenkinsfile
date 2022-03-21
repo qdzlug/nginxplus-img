@@ -30,6 +30,7 @@ pipeline {
         {
           sh '''
           . $WORKSPACE/dib-elements/bin/activate
+          export DIB_DHCP_NETWORK_MANAGER_AUTO=true
           export DIB_RELEASE=bullseye
           export DIB_DEBUG_TRACE=1
           export ELEMENTS_PATH=$WORKSPACE/debian/elements
