@@ -82,8 +82,8 @@ echo "$(date)": Validating the Version
 
 # Clean up the certs
 echo "$(date)": Cleaning the Certs
-rm /etc/ssl/nginx/nginx-repo.crt || exit
-rm /etc/ssl/nginx/nginx-repo.key || exit
+rm /etc/ssl/nginx/nginx-repo.crt || true
+rm /etc/ssl/nginx/nginx-repo.key || true
 
 # Cleaning the work directory
 echo "$(date)": Cleaning the Work diretory
