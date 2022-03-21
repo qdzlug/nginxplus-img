@@ -2,6 +2,6 @@
 
 # Remove links to disable....
 echo "$(date)": Remove networking links
-rm /etc/systemd/system/multi-user.target.wants/networking.service
-rm /etc/systemd/system/network-online.target.wants/networking.service
-rm /etc/systemd/system/network-online.target.wants/NetworkManager-wait-online.service
+rm /etc/systemd/system/multi-user.target.wants/networking.service || true
+rm /etc/systemd/system/network-online.target.wants/networking.service || true
+rm /etc/systemd/system/network-online.target.wants/NetworkManager-wait-online.service || true
