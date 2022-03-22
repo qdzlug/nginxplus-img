@@ -14,7 +14,7 @@ pipeline {
 
     stage('Configure Environment') {
       steps {
-        sh '''sudo apt -y install virtualenvwrapper qemu-utils python3-diskimage-builder libguestfs-tools
+        sh '''sudo apt -y install virtualenvwrapper qemu-utils python3-diskimage-builder libguestfs-tools gpg-agent
         virtualenv $WORKSPACE/dib-elements
         . $WORKSPACE/dib-elements/bin/activate
         pip install diskimage-builder
