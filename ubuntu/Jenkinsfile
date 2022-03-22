@@ -30,12 +30,9 @@ pipeline {
         {
           sh '''
           . $WORKSPACE/dib-elements/bin/activate
+          export DIB_DHCP_NETWORK_MANAGER_AUTO=true
           export DIB_RELEASE=focal
           export DIB_DEBUG_TRACE=1
-          export DIB_DEV_USER_USERNAME=devuser
-          export DIB_DEV_USER_SHELL=/bin/bash
-          export DIB_DEV_USER_PWDLESS_SUDO=yes
-          export DIB_DEV_USER_PASSWORD=password
           export ELEMENTS_PATH=$WORKSPACE/ubuntu/elements
           disk-image-create -a amd64 -o nginxplus-ubuntu-$BUILD_ID.qcow2 block-device-mbr nginx-plus
           '''
