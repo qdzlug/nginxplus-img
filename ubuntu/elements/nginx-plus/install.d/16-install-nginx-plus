@@ -23,7 +23,8 @@ chmod 644 /etc/ssl/nginx/nginx-repo.key
 # Download and install the signing key
 echo "$(date)": Install Signing Key
 cd $WORKDIR || exit
-wget https://cs.nginx.com/static/keys/nginx_signing.key && sudo apt-key add nginx_signing.key
+#wget https://cs.nginx.com/static/keys/nginx_signing.key &&  apt-key add nginx_signing.key
+curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg
 
 # Install the reqs
 echo "$(date)": Install Prequisities
@@ -32,7 +33,8 @@ apt-get install -y apt-transport-https lsb-release ca-certificates
 
 # Add the repo
 echo "$(date)": Adding the NGINX Plus repo
-printf "deb https://pkgs.nginx.com/plus/ubuntu $(lsb_release -cs) nginx-plus\n" | sudo tee /etc/apt/sources.list.d/nginx-plus.list
+printf "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://pkgs.nginx.com/plus/ubuntu $(lsb_release -cs) nginx-plus\n" | sudo tee /etc/apt/sources.list.d/nginx-plus.list
+##echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg]  http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
 
 # Download the nginx-plus apt configuration to /etc/apt/apt.conf.d:
 echo "$(date)": Adding the NGINX Plus Apt Config
