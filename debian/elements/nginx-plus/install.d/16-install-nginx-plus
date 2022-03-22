@@ -80,9 +80,10 @@ echo "$(date)": Validating the Version
 /usr/sbin/nginx -v
 
 # Clean up the certs
-echo "$(date)": Cleaning the Certs
+echo "$(date)": Cleaning the Certs and Repo
 rm /etc/ssl/nginx/nginx-repo.crt || true
 rm /etc/ssl/nginx/nginx-repo.key || true
+rm /etc/apt/sources.list.d/nginx-plus.list || true
 
 # Cleaning the work directory
 echo "$(date)": Cleaning the Work diretory
