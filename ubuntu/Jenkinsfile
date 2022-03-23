@@ -27,7 +27,7 @@ pipeline {
         sh '''
         ssh-keygen -t ed25519 -a 100 -N ''  -C nginxplus_sync -f $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/id_rsa
         KEY=$(cat $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/id_rsa.pub)
-        print "from=\"169.254.0.1,169.254.0.2\" $KEY" > $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/authorized_keys
+        echo 'from="169.254.0.1,169.254.0.2" ' $KEY > $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/authorized_keys
         '''
       }
     }
