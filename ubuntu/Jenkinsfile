@@ -25,6 +25,8 @@ pipeline {
     stage('Build SSH Keys') {
       steps {
         sh '''
+        # Make sure the directory is clean...
+        rm $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/* || true
         ssh-keygen -t ed25519 -a 100 -N ''  -C nginxplus_sync -f $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/id_rsa
         KEY=$(cat $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/id_rsa.pub)
         echo 'from="169.254.0.1,169.254.0.2" ' $KEY > $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/authorized_keys
@@ -66,15 +68,7 @@ pipeline {
 
   post {
     failure {
-
-          /*
-           * On failure we still need to remove the partial build; however, we want to make sure we exit with a zero
-           * status so we can move on to the next step. Hence the "or true" logic below.W
-           */
-
-          sh '''
-            cleanWs()
-           '''
+      cleanWs()
     }
    }
 }
