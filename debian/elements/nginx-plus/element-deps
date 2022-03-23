@@ -8,3 +8,4 @@ openssh-server
 package-installs
 pkg-map
 vm
+journal-to-console
