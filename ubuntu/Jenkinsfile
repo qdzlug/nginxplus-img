@@ -5,7 +5,7 @@ pipeline {
     }
   }
   stages {
-    stage('Checkout Scm') {
+    stage('Checkout SCM') {
       steps {
       checkout([$class: 'GitSCM', branches: [[name: '**']], extensions: [[$class: 'PerBuildTag']],
                 userRemoteConfigs: [[url: 'https://github.com/qdzlug/nginxplus-img']]])
@@ -30,6 +30,15 @@ pipeline {
         ssh-keygen -t ed25519 -a 100 -N ''  -C nginxplus_sync -f $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/id_rsa
         KEY=$(cat $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/id_rsa.pub)
         echo 'from="169.254.0.1,169.254.0.2" ' $KEY > $WORKSPACE/ubuntu/elements/nginx-plus/static/root/.ssh/authorized_keys
+        '''
+      }
+    }
+
+    stage('Write Build Information') {
+      steps {
+        sh '''
+        # Write out build information
+        echo Build $BUILD_ID at `date` > $WORKSPACE/ubuntu/elements/nginx-plus/static/etc/jenkins.txt
         '''
       }
     }
