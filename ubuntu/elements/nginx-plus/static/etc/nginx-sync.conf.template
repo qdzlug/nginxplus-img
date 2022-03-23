@@ -1,0 +1,3 @@
+NODES="NGINX_SYNC_NODES"
+CONFPATHS="/etc/nginx/nginx.conf /etc/nginx/conf.d"
+EXCLUDE="default.conf"

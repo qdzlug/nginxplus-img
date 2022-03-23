@@ -1,0 +1,71 @@
+     global_defs {
+          vrrp_version 3
+      }
+      vrrp_script chk_manual_failover {
+          script   /usr/lib/keepalived/nginx-ha-manual-failover
+          interval 10
+          weight   50
+      }
+      vrrp_script chk_nginx_service {
+          script   /usr/lib/keepalived/nginx-ha-check
+          interval 3
+          weight   50
+      }
+      vrrp_instance VI_1 {
+          state                      VI_1_STATE
+          interface                  enp0s0
+          nopreempt
+          priority                   125
+          virtual_router_id          52
+          use_vmac
+          vmac_xmit_base
+          advert_int                 1
+          accept
+          garp_master_refresh        5
+          garp_master_refresh_repeat 1
+          unicast_src_ip             VI_1_UNICAST_SRC_IP
+
+          unicast_peer {
+             VI_1_UNICAST_PEER
+          }
+
+          virtual_ipaddress {
+              VI_1_VIRTUAL_IP_ADDRESS
+          }
+
+          track_script {
+              chk_nginx_service
+              chk_manual_failover
+          }
+
+          notify /usr/lib/keepalived/nginx-ha-notify
+      }
+
+
+      vrrp_instance VI_2 {
+          state                  BACKUP
+          interface                 enp10s0
+          nopreempt
+          priority                   125
+          virtual_router_id          52
+          advert_int                 1
+          accept
+          garp_master_refresh        5
+          garp_master_refresh_repeat 1
+          unicast_src_ip             VI_2_UNICAST_SRC_IP
+
+          unicast_peer {
+             VI_2_UNICAST_PEER
+          }
+
+          virtual_ipaddress {
+              VI_2_VIRTUAL_IPADDRESS
+          }
+
+          track_script {
+              chk_nginx_service
+              chk_manual_failover
+          }
+
+          notify /usr/lib/keepalived/nginx-ha-notify
+      }
