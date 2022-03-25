@@ -1,0 +1,46 @@
+#cloud-config
+#
+# This is a standalone configuration for one NGINX Plus instance.
+#
+# Note that this is for example purposes only; users will need to add all information
+# that is enclosed in angle brackets <>
+#
+# The images built by this pipeline will have NICs in the format of enpXs0, where X is
+# the number of the NIC. NIC numbering starts at 1.
+#
+manual_cache_clean: true
+manage_etc_hosts: true
+hostname: nplus-standalone
+users:
+  - name: nplus
+    groups: sudo
+    shell: /bin/bash
+    lock-passwd: false
+    passwd: <HASHED-PASSWORD>
+    sudo:
+      - ALL=(ALL) NOPASSWD:ALL
+    ssh-authorized-keys: >-
+      <YOURKEY>
+write_files:
+  - path: /etc/network/interfaces.d/<NIC1>
+    permissions: '0644'
+    defer: true
+    content: |
+      auto <NIC1>
+      iface <NIC1> inet static
+      address <NIC1_IP_ADDRESS>
+      netmask <NIC1_NETMASK>
+      gateway <NIC1_GATEWAY>
+      dns-nameservers <NAMESERVERS SPACE DELIMITED>
+runcmd:
+  - - systemctl
+    - restart
+    - networking
+  - - systemctl
+    - enable
+    - '--now'
+    - resolvconf
+ssh_authorized_keys:
+  - >
+    YOURKEY
+

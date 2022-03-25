@@ -1,0 +1,79 @@
+#cloud-config
+manual_cache_clean: true
+manage_etc_hosts: true
+hostname: nginix-primary
+users:
+  - name: nplus
+    groups: sudo
+    shell: /bin/bash
+    lock-passwd: false
+    passwd: $6$jq4P5K1S2PAYxVt8$/jPIMbBf5jje6BLGoCRO9gZsIYGkYCEUeFzUQ2Hch4fdtlNCGbg0zTdYk/.8dZj/DqixpKUm5K9wEJtOOVdKi.
+    sudo:
+      - ALL=(ALL) NOPASSWD:ALL
+    ssh-authorized-keys: >-
+      ssh-rsa
+      AAAAB3NzaC1yc2EAAAADAQABAAABAQDh6ROxdnUrSAmjyqzlpvcSFlXcSwD7VMp7PvCTzAtDePSluBiQq3njWW88Pcxgmhsqhsm/ZjRKTdFO5RWRt2YM3BsZQqIMlsulIKK426RavgtnMYpJuUhTkyVm1QQAaoOH4NvkBOk35VOWylzxSZFa2v+LExjOQzQM5CfXB2GX7KerNNvEMNuTnFQ5upuV8YOEeeeomfLmt/I8VMxFJiSQWlELkS2NBVbhWKHcRaE2T2X2eASaruqlDhSMgeE0K/8bRuLquvv5j0F3rQ6slbVi0zjdIMRUlwD4gsZOQaSiFrQceItR+slp3/2FT/o6uxW/lJu3sW5RkHNHMxubSFpl
+      jschmidt@jack.virington.com
+chpasswd:
+  list: |
+    root:password
+  expire: false
+write_files:
+  - path: /etc/network/interfaces.d/enp2s0
+    permissions: '0644'
+    defer: true
+    content: |
+      auto enp1s0
+      iface enp1s0 inet static
+      address 192.168.216.216
+      netmask 255.255.255.0
+      gateway 192.168.216.1
+      dns-nameservers 192.168.216.1 192.168.213.2
+  - path: /etc/network/interfaces.d/enp10s0
+    permissions: '0644'
+    defer: true
+    content: |
+      auto enp10s0
+      iface enp10s0 inet static
+      address 169.254.0.1
+      netmask 255.255.255.0
+  - path: /usr/local/bin/build-configs
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      cp /etc/keepalived/keepalived.conf.template /etc/keepalived/keepalived.conf.template.hold
+      sed -i 's/VI_1_STATE/PRIMARY/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_INTERFACE/enp10s0/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_UNICAST_SRC_IP/169.254.0.1/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_UNICAST_PEER/169.254.0.2/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_VIRTUAL_IP_ADDRESS/169.254.0.3/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_STATE/PRIMARY/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_INTERFACE/enp1s0/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_UNICAST_SRC_IP/192.168.216.216/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_UNICAST_PEER/192.168.216.217/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_VIRTUAL_IPADDRESS/192.168.216.215/g' /etc/keepalived/keepalived.conf.template
+      cp /etc/keepalived/keepalived.conf.template /etc/keepalived/keepalived.conf
+      sed -i 's/NGINX_SYNC_NODES/192.168.216.217/g' /etc/nginx-sync.conf.template
+      cp /etc/nginx-sync.conf.template /etc/nginx-sync.conf
+
+runcmd:
+  - - '/bin/bash'
+    - '-v'
+    - '/usr/local/bin/build-configs'
+  - - systemctl
+    - restart
+    - networking
+  - - systemctl
+    - enable
+    - '--now'
+    - resolvconf
+  - - systemctl
+    - enable
+    - '--now'
+    - keepalived
+ssh_authorized_keys:
+  - >
+    ssh-rsa
+    AAAAB3NzaC1yc2EAAAADAQABAAABAQDh6ROxdnUrSAmjyqzlpvcSFlXcSwD7VMp7PvCTzAtDePSluBiQq3njWW88Pcxgmhsqhsm/ZjRKTdFO5RWRt2YM3BsZQqIMlsulIKK426RavgtnMYpJuUhTkyVm1QQAaoOH4NvkBOk35VOWylzxSZFa2v+LExjOQzQM5CfXB2GX7KerNNvEMNuTnFQ5upuV8YOEeeeomfLmt/I8VMxFJiSQWlELkS2NBVbhWKHcRaE2T2X2eASaruqlDhSMgeE0K/8bRuLquvv5j0F3rQ6slbVi0zjdIMRUlwD4gsZOQaSiFrQceItR+slp3/2FT/o6uxW/lJu3sW5RkHNHMxubSFpl
+    jschmidt@jack.virington.com
+

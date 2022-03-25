@@ -1,26 +1,48 @@
 ## NGINX Plus VM Image Build
-This repository will walk you through the process of building a qcow2 image file that will enable you to deploy NGINX Plus in a VM. 
+
+This repository will walk you through the process of building a qcow2 image file that will enable you to deploy NGINX
+Plus in a VM. Note that this is an exceptionally opinionated build; please see the [Usage Notes](./docs/Usage.md)
+for full details on how to use this image, as well as information on the build decisions.
 
 ## Important Caveats
-- You need to have a supported linux build environment. These builds were done on Ubuntu 21.04; your mileage may vary on other platforms.
-- This process uses [diskimage-builder](https://docs.openstack.org/diskimage-builder/latest/index.html) to create the image.
-* This process requires that you have a valid cert/key pair for NGINX Plus.
-* The cert and key are used in the buld, but are not contained in the repository. They are pulled from a local http server (instructions below) and removed from the image prior to it being finalized. 
-- This process will build a bare-bones deployment that exposes the API and nginx-dashboard as part of the deployment; this is only for development and teting purposes, with the configuration being passed in a heredoc. For actual usage, the data should be passed using the disk-image-builder `extra-data.d` element.
-- The image built is can be based off Debian 10 or CentOS 7, with a selection of packages suitable for debugging. These can be adjusted as needed.
+
+- You need to have a supported linux build environment. These builds were done on Ubuntu 21.04; your mileage may vary on
+  other platforms.
+
+- This process uses [diskimage-builder](https://docs.openstack.org/diskimage-builder/latest/index.html) to create the
+  image.
+
+- This process requires that you have a valid cert/key pair for NGINX Plus.
+
+- The cert and key are used in the build, but are not contained in the repository. They are injected at build time from
+  Jenkins; if you are not using Jenkins you can replicate this by copying them to the appropriate directories under
+  the `static` part of the build hierarchy.
+
+- This process will build a bare-bones deployment that exposes the API and nginx-dashboard as part of the deployment;
+  this is only for development and testing purposes, with the configuration being passed in a heredoc. For actual usage,
+  the data should be passed using the disk-image-builder `extra-data.d` element.
+
+- The image built is can be based off Debian 11 (Bullseye) or Ubuntu 20.04 (Focal). There is a directory for a CentOS
+  build but this option is deprecated and not maintained.
+
+- Sample cloud configurations are included.
 
 ## Setup
+
 It is recommended that you install the diskimage builder in a virtualenv:
+
 - `sudo apt install virtualenvwrapper`
 - `virtualenv dib-elements`
 - `source dib-elements/bin/activate`
 - ` pip install diskimage-builder`
 
-
 ## Key Files
-A full discussion of the diskimage build system is out of scope for this document, and instead we will focus on the key configuration files for this project. It is *highly* recommended that you review the documentation on the build process prior to attempting any major changes in order to fully understand the possible effects of thsoe changes.
 
-The file/directory structure for the bulding process looks like this:
+A full discussion of the diskimage build system is out of scope for this document, and instead we will focus on the key
+configuration files for this project. It is *highly* recommended that you review the documentation on the build process
+prior to attempting any major changes in order to fully understand the possible effects of those changes.
+
+The file/directory structure for the build process looks like this:
 
 ```
 nginx-plus
@@ -36,7 +58,19 @@ nginx-plus
 │           ├── install.d
 │           ├── nginxplus.d
 │           └── post-install.d
-└── debian
+├── debian
+    └── elements
+        ├── dib-elements
+        │   ├── bin
+        │   ├── lib
+        │   └── share
+        └── nginx-plus
+            ├── environment.d
+            ├── extra-data.d
+            ├── install.d
+            ├── post-install.d
+            └── static
+└── ubuntu
     └── elements
         ├── dib-elements
         │   ├── bin
@@ -47,59 +81,56 @@ nginx-plus
             ├── extra-data.d
             ├── install.d
             ├── nginxplus.d
-            └── post-install.d
+            ├── post-install.d
+            └── static
 ```
 
-| File/Directory | Purpose |
-|----------------|---------|
-| element-deps   | List of the key dependencies for the image buid; includes the base image to be used and what tasks to complete (such as enabling a serial console)    |
-| environment.d | Files that define the environment |
-| 10-cloud-init-datasources                | Configures cloud-init for various clouds / environments. For example, OpenStack and Ec2.         |
-| extra-data.d                | Currently empty; can be used to pass files into the build environment.         |
-| install.d                | Files used during the install phase of the build. |
-| 15-install-nginx-plus | Customized script to install nginx-plus; uses an external webserver for certs and has an inline configuration. |
-| 18-copy-util-scripts | Customized networking scripts for the debian image; these are not very robust. |
-| package-installs.yaml | List of packages to be installed |
-| pkg-map | Mapping between package names between releases and families |
-| post-install.d | Currently empty; scripts / steps to be run following installation |
+| File/Directory            | Purpose                                                                                                                                            |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| element-deps              | List of the key dependencies for the image buid; includes the base image to be used and what tasks to complete (such as enabling a serial console) |
+| environment.d             | Files that define the environment                                                                                                                  |
+| 10-cloud-init-datasources | Configures cloud-init for various clouds / environments. For example, OpenStack and Ec2.                                                           |
+| extra-data.d              | Currently empty; can be used to pass files into the build environment.                                                                             |
+| install.d                 | Files used during the install phase of the build.                                                                                                  |
+| 15-install-nginx-plus     | Customized script to install nginx-plus; uses an external webserver for certs and has an inline configuration.                                     |
+| package-installs.yaml     | List of packages to be installed                                                                                                                   |
+| pkg-map                   | Mapping between package names between releases and families                                                                                        |
+| post-install.d            | Currently empty; scripts / steps to be run following installation                                                                                  |
+| static                    | Static files to be copied directly into the image                                                                                                  |
 
-OF these, the most likely files you will need to change are:
+Of these, the most likely files you will need to change are:
+
 - The cloud init datasources, in order to build images for different clouds and environments.
 - The install script, for a number of reasons:
     - Change the location of where the scripts are pulled from.
-    - Change the configurtion that is passed through.
+    - Change the configuration that is passed through.
     - Make use of the extra-data.d process to bring different content into the image.
+    - Add files into the static directory to build bespoke files into the image.
 - Package installs, to add/remove packages from the final image.
 
-
 ## Cert Management
-This process is designed to stamp out preconfigured images w/ NGINX Plus installed without containing the cert/key pair. The way to accomplish this is to put the files into a tar archive called `certs.tar` and serve it from any location you wish. The testing has all been done with the node-httpserver module from localhost. This can be installed with a simple `npm install http-server`, and then run in a directory containing your `certs.tar` file via `http-server`:
 
-```
-http-server
-Starting up http-server, serving ./
-Available on:
-  http://127.0.0.1:8081
-  http://192.168.213.42:8081
-  http://192.168.213.63:8081
-  http://10.48.208.1:8081
-  http://172.17.0.1:8081
-  http://10.1.164.128:8081
-Hit CTRL-C to stop the server
-```
+This process is designed to stamp out preconfigured images w/ NGINX Plus installed without containing the cert/key pair.
+These are passed through using the static directory; please see the relevant configuration directory for full details 
+on how to accomplish this.
 
-## Build Processs
+## Build Process
+
 The build process involves two steps:
-1. Export the path to `elements` directory you created for the build type you wish (Debian or CentOS); this can be absolute or relative. For example, `export ELEMENTS_PATH=./elements` or `export ELEMENTS_PATH=$HOME/repos/nginxplus-img/debian/elements`
-2. Set your version variable. Currently has been tested with `DIB_RELEASE=7` for CentOS and `DIB_RELEASE=bullseye` for Debian
+
+1. Export the path to `elements` directory you created for the build type you wish (Debian or CentOS); this can be
+   absolute or relative. For example, `export ELEMENTS_PATH=./elements`
+   or `export ELEMENTS_PATH=$HOME/repos/nginxplus-img/debian/elements`
+2. Set your version variable. Currently, has been tested with `DIB_RELEASE=bullseye` for
+   Debian and `DIB_RELEASE=focal` for Ubuntu.
 2. Run the disk image creation process. This requires that you provide:
     1. The architecture (in this case amd64)
-    2. The output file, including the file extention indicating the format.
+    2. The output file, including the file extension indicating the format.
     2. The partition format being used; in this case we are using a block device with an MBR.
     3. The name of the project being built, in this case nginx-plus.
 4. Command line: `disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus`
 
- ## Example 
+## Example
 
  ```
 $ disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus
@@ -127,11 +158,17 @@ $ disk-image-create -a amd64 -o nginxplus.qcow2 block-device-mbr nginx-plus
 ```
 
 ### Notes
-- If there are any issues with the build you will need to remediate them; the most common issues are around packages that need to be installed on the build machine.
-- This process may rquire sudo permissions depneding on your bulid environment. 
+
+- If there are any issues with the build you will need to remediate them; the most common issues are around packages
+  that need to be installed on the build machine.
+- This process may require sudo permissions depending on your build environment.
 
 ## Post Build Editing
-It is possible to make changes to the image after it is built without re-running the build process. This requires that you use a utility such as [virt-customize](https://libguestfs.org/virt-customize.1.html). For example, the following code can be used to add a user, set the password for the user, add the user to the sudoers file, and inject an ssh key for the user:
+
+It is possible to make changes to the image after it is built without re-running the build process. This requires that
+you use a utility such as [virt-customize](https://libguestfs.org/virt-customize.1.html). For example, the following
+code can be used to add a user, set the password for the user, add the user to the sudoers file, and inject an ssh key
+for the user:
 
 ```
  virt-customize -a theimage.qcow2 --run-command "adduser theuser"
@@ -140,7 +177,7 @@ It is possible to make changes to the image after it is built without re-running
  virt-customize -a theimage.qcow2 --ssh-inject theuser:string:"thesshkey"
  ````
 
- You will need to subsitute you own values for _theimage_, _theuser_, _thepass_, and _thesshkey_.
+You will need to substitute your own values for _theimage_, _theuser_, _thepass_, and _thesshkey_.
 
  
 

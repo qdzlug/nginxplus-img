@@ -1,0 +1,77 @@
+#cloud-config
+#
+# This is a secondary HA configuration for one NGINX Plus instance.
+#
+# Note that this is for example purposes only; users will need to add all information
+# that is enclosed in angle brackets <>
+#
+# The images built by this pipeline will have NICs in the format of enpXs0, where X is
+# the number of the NIC. NIC numbering starts at 1.
+#
+manual_cache_clean: true
+manage_etc_hosts: true
+hostname: nginix-secondary
+  users:
+      - name: nplus
+        groups: sudo
+        shell: /bin/bash
+        lock-passwd: false
+        passwd: <HASHED-PASSWORD>
+        sudo:
+          - ALL=(ALL) NOPASSWD:ALL
+        ssh-authorized-keys: >-
+          <YOURKEY>
+  write_files:
+    - path: /etc/network/interfaces.d/<NIC1>
+      permissions: '0644'
+      defer: true
+      content: |
+        auto <NIC1>
+        iface <NIC1> inet static
+        address <NIC1_IP_ADDRESS>
+        netmask <NIC1_NETMASK>
+        gateway <NIC1_GATEWAY>
+        dns-nameservers <NAMESERVERS SPACE DELIMITED>
+    - path: /etc/network/interfaces.d/<NIC2>
+      permissions: '0644'
+      defer: true
+      content: |
+        auto <NIC2>
+        iface <NIC2> inet static
+        address <NIC2>
+        netmask <NIC2>
+  - path: /usr/local/bin/build-configs
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      sed -i 's/VI_1_STATE/PRIMARY/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_INTERFACE/<NIC2>/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_UNICAST_SRC_IP/<NIC2_IP_ADDRESS>/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_UNICAST_PEER/<HA_VI1_PRIMARY_IP_ADDRESS>/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_1_VIRTUAL_IP_ADDRESS/<HA_VI1_VIP>/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_STATE/PRIMARY/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_INTERFACE/<NIC1>/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_UNICAST_SRC_IP/<NIC1_IP_ADDRESS>/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_UNICAST_PEER/<HA_VI2_PRIMARY_IP_ADDRESS>/g' /etc/keepalived/keepalived.conf.template
+      sed -i 's/VI_2_VIRTUAL_IPADDRESS/<HA_VI2_VIP>/g' /etc/keepalived/keepalived.conf.template
+      cp /etc/keepalived/keepalived.conf.template /etc/keepalived/keepalived.conf
+
+runcmd:
+  - - '/bin/bash'
+    - '-v'
+    - '/usr/local/bin/build-configs'
+  - - systemctl
+    - restart
+    - networking
+  - - systemctl
+    - enable
+    - '--now'
+    - resolvconf
+  - - systemctl
+    - enable
+    - '--now'
+    - keepalived
+ssh_authorized_keys:
+  - >
+    <YOURKEY>
+
