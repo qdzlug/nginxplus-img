@@ -13,7 +13,7 @@
       }
       vrrp_instance VI_1 {
           state                      VI_1_STATE
-          interface                  enp0s0
+          interface                  VI_1_INTERFACE
           nopreempt
           priority                   125
           virtual_router_id          52
@@ -43,8 +43,8 @@
 
 
       vrrp_instance VI_2 {
-          state                  BACKUP
-          interface                 enp10s0
+          state                     VI_2_STATE
+          interface                 VI_2_INTERFACE
           nopreempt
           priority                   125
           virtual_router_id          52
