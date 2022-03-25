@@ -38,7 +38,13 @@ pipeline {
       steps {
         sh '''
         # Write out build information
-        echo Build $BUILD_ID at `date` > $WORKSPACE/debian/elements/nginx-plus/static/etc/jenkins.txt
+        JENKINS_TXT=$WORKSPACE/ubuntu/elements/nginx-plus/static/etc/jenkins.txt
+        echo "=============================================================" > $JENKINS_TXT
+        echo Build $BUILD_TAG at `date` >> $JENKINS_TXT
+        echo Github URL: $GIT_URL >> $JENKINS_TXT
+        echo Branch: $GIT_BRANCH >> $JENKINS_TXT
+        echo Commit: $GIT_COMMIT >> $JENKINS_TXT
+        echo "=============================================================" >> $JENKINS_TXT
         '''
       }
     }
