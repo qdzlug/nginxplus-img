@@ -46,7 +46,7 @@ pipeline {
         echo Commit: $GIT_COMMIT >> $JENKINS_TXT
         echo "=============================================================" >> $JENKINS_TXT
         # Copy over the documentation
-        cp $WORKSPACE/docs/Usage.md $WORKSPACE/ubuntu/nginx-plus/static/root/Usage.md
+        cp $WORKSPACE/docs/Usage.md $WORKSPACE/ubuntu/elements/nginx-plus/static/root/Usage.md
         '''
       }
     }

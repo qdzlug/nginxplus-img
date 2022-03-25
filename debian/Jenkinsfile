@@ -38,7 +38,7 @@ pipeline {
       steps {
         sh '''
         # Write out build information
-        JENKINS_TXT=$WORKSPACE/ubuntu/elements/nginx-plus/static/etc/jenkins.txt
+        JENKINS_TXT=$WORKSPACE/debian/elements/nginx-plus/static/etc/jenkins.txt
         echo "=============================================================" > $JENKINS_TXT
         echo Build $BUILD_TAG at `date` >> $JENKINS_TXT
         echo Github URL: $GIT_URL >> $JENKINS_TXT
@@ -46,7 +46,7 @@ pipeline {
         echo Commit: $GIT_COMMIT >> $JENKINS_TXT
         echo "=============================================================" >> $JENKINS_TXT
         # Copy over the documentation
-        cp $WORKSPACE/docs/Usage.md $WORKSPACE/ubuntu/nginx-plus/static/root/Usage.md
+        cp $WORKSPACE/docs/Usage.md $WORKSPACE/debian/elements/nginx-plus/static/root/Usage.md
         '''
       }
     }
