@@ -33,6 +33,6 @@ jobs:
     - name: Scan the image and upload dependency results
       uses: anchore/sbom-action@bb716408e75840bbb01e839347cd213767269d4a
       with:
-        image: "localbuild/testimage:latest"
+        path: "./"
         artifact-name: image.spdx.json
         dependency-snapshot: true
